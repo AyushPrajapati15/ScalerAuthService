@@ -3,14 +3,12 @@ package com.example.authservice.services;
 import com.example.authservice.exceptions.PasswordMismatchException;
 import com.example.authservice.models.Token;
 import com.example.authservice.models.User;
-import com.example.authservice.repositories.TokenRepositoy;
+import com.example.authservice.repositories.TokenRepository;
 import com.example.authservice.repositories.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -20,14 +18,14 @@ public class UserServiceImpl implements UserService{
 
     private UserRepository userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private TokenRepositoy tokenRepositoy;
+    private TokenRepository tokenRepository;
 
     public UserServiceImpl(UserRepository userRepository,
                            BCryptPasswordEncoder passwordEncoder,
-                           TokenRepositoy tokenRepositoy) {
+                           TokenRepository tokenRepository) {
         this.userRepository=userRepository;
         this.bCryptPasswordEncoder=passwordEncoder;
-        this.tokenRepositoy=tokenRepositoy;
+        this.tokenRepository=tokenRepository;
     }
 
     @Override
@@ -68,11 +66,15 @@ public class UserServiceImpl implements UserService{
         token.setUser(user);
         token.setValue(RandomStringUtils.randomAlphanumeric(128));
         token.setExpiryDate(expiryDate);
-        return tokenRepositoy.save(token);
+        return tokenRepository.save(token);
     }
 
     @Override
     public User validateToken(String tokenValue) {
+        Optional<Token> optionalToken =tokenRepository.findByTokenValueAndExpiryDateAfter(tokenValue, new Date());
+        if (optionalToken.isEmpty()){
+
+        }
         return null;
     }
 }
